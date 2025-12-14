@@ -1,0 +1,7 @@
+Features:
+    - Add
+    - Edit
+    - Configure
+    - View All
+    - Delete
+    
