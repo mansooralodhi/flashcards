@@ -31,17 +31,16 @@ sqlite3.register_converter("TIMESTAMP", convert_datetime) # sqlite3 -> python
 class Database(object):
 
     def __init__(self):
-        self.db_file = 'sqldb.py'
+        self.db_file = 'database.sql'
         self.table_name = 'DICTIONARY'
         self.connection = sqlite3.connect(self.db_file, detect_types=sqlite3.PARSE_DECLTYPES)
         self.cursor = self.connection.cursor()
-        if not self.table_exists:
-            self.create_table()
+        self.init_db()
 
-    def create_table(self):
+    def init_db(self):
         with self.connection:
             self.cursor.execute("""
-                                CREATE TABLE DICTIONARY (
+                                CREATE TABLE IF NOT EXISTS DICTIONARY (
                                 ID INTEGER PRIMARY KEY AUTOINCREMENT,
                                 WORD TEXT,
                                 DEFINITION TEXT,
@@ -49,6 +48,11 @@ class Database(object):
                                 CREATED_AT TIMESTAMP DEFAULT (DATE ('now'))
                             )""")
 
+    def get_table(self) -> Sequence[str]:
+        with self.connection:
+            self.cursor.execute(" SELECT name FROM sqlite_master WHERE type='table' AND name=? ", (self.table_name,))
+            return self.cursor.fetchall()
+        
     def drop_table(self):
         with self.connection:
             self.cursor.execute(" DROP TABLE IF EXISTS DICTIONARY ")
