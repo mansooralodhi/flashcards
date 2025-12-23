@@ -164,6 +164,16 @@ class MainWindow(tk.Tk):
         self.start_date = None
         self.end_date = None
 
+        self.voice_setup()
+
+    def voice_setup(self):
+        engine = pyttsx3.init()
+        for voice in engine.getProperty('voices'):
+            if "de" in voice.id.lower() or "german" in voice.name.lower():
+                self.deuVoiceID = voice.id
+            if "en" in voice.id.lower() or "english" in voice.name.lower():
+                self.engVoiceID = voice.id
+
     def update_dic(self, collection=None):
         self.dictionary = Dictionary(collection=self.db.get_all_records() if collection is None else collection)
         self.dictionaryItr = iter(self.dictionary)
@@ -212,8 +222,8 @@ class MainWindow(tk.Tk):
         window = AddWindow(self, word)
         self.wait_window(window)
         if not (window.word.word and window.word.definition): return
-        # add word to self.dictionary and self.dictionary_itr  
         self.db.insert_record(window.word) if window.word.id == -1 else self.db.update_record(window.word)
+        self.update_dic()
 
     def command_next(self):
         if self.dictionary.len_collection:
@@ -223,7 +233,6 @@ class MainWindow(tk.Tk):
         else:
             self.canvas.head = "No Cards"
             self.canvas.tail = "No Cards"
-            print("Dictionary is empty !!!")
         self.canvas.is_head = True
         self.canvas.write_text(self.canvas.head)
         
@@ -237,10 +246,14 @@ class MainWindow(tk.Tk):
     
     def command_speaker(self):
         speaker = pyttsx3.init()
-        speaker.setProperty('voice', speaker.getProperty('voices')[2].id)
         speaker.setProperty('rate', 150)
         speaker.setProperty('volume', 1)
-        speaker.say(self.canvas.head) if self.canvas.is_head else speaker.say(self.canvas.tail)
+        if self.canvas.is_head:
+            speaker.setProperty('voice', self.deuVoiceID)
+            speaker.say(self.canvas.head)
+        else:
+            speaker.setProperty('voice', self.engVoiceID)
+            speaker.say(self.canvas.tail)
         speaker.runAndWait()
 
     def command_add(self):
@@ -248,7 +261,6 @@ class MainWindow(tk.Tk):
         window = AddWindow(self)
         self.wait_window(window)
         if window.word.word and window.word.definition:
-            # todo: add word to self.dictionary and self.dictionary_itr  
             self.db.insert_record(window.word)
             self.update_dic()
 
@@ -266,30 +278,7 @@ class MainWindow(tk.Tk):
 
     def view_all(self):
         win = ViewAllWindow(self)
-        # def delete_selections():
-        #     for id, var in selections.items():
-        #         if var.get():
-        #             self.db.remove_record_by_id(str(id))
-
-        #     self.update_dic()
-        #     window.destroy()
-                
-        # window = tk.Toplevel(self)
-        # window.title("Database")
-        # window.geometry("300x400")
-
-        # if not self.dictionary.len_collection:
-        #     return
-
-        # selections = dict() 
-        # for n, record in enumerate(self.dictionary.collection):
-        #     var = tk.IntVar()
-        #     btn = tk.Checkbutton(window, text=record.word, variable=var)
-        #     btn.grid(row=n, column=0, padx=(20,0), sticky='w') 
-        #     selections[record.id] = var
-        # btn = tk.Button(window, text='Delete', command=delete_selections)
-        # btn.grid(row=n+1, column=1, padx=(20,0), pady=(20,10))
-  
+        self.wait_window(win)
 
 
 
