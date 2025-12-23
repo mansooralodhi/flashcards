@@ -188,8 +188,8 @@ class MainWindow(tk.Tk):
         self.canvas = Canvas(self.frame, width=250, height=150)
         self.btn_speaker = tk.Button(self.frame, text="🔊", command=self.command_speaker, font=("Georgia Pro Cond Black", 13), width=2, height=0)
         self.subframeE = tk.Frame(self.frame)
-        self.btn_exportdb = tk.Button(self.subframeE, text="Export DB", width=10)
-        self.btn_importdb = tk.Button(self.subframeE, text="Import DB", width=10)
+        self.btn_exportdb = tk.Button(self.subframeE, text="Export DB", state=tk.DISABLED, width=10)
+        self.btn_importdb = tk.Button(self.subframeE, text="Import DB", state=tk.DISABLED, width=10)
         # self.btn_exportcsv = tk.Button(self.subframeE, text="Export CSV", width=10)
         self.subframeS = tk.Frame(self.frame)
         self.btn_edit = tk.Button(self.subframeS, text="Edit", command=self.command_edit, width=8)
@@ -246,7 +246,7 @@ class MainWindow(tk.Tk):
     
     def command_speaker(self):
         speaker = pyttsx3.init()
-        speaker.setProperty('rate', 150)
+        speaker.setProperty('rate', 120) # words per minute
         speaker.setProperty('volume', 1)
         if self.canvas.is_head:
             speaker.setProperty('voice', self.deuVoiceID)
@@ -265,7 +265,7 @@ class MainWindow(tk.Tk):
             self.update_dic()
 
     def command_configure(self):
-        window = ConfigureWindow(self, self.dictionary)
+        window = ConfigureWindow(self)
         self.wait_window(window)
         if not self.typ:
             if self.start_date == self.end_date:

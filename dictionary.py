@@ -14,6 +14,7 @@ class Word:
         
 class Dictionary:
     def __init__(self, collection: Sequence[Word]):
+        shuffle(collection)
         self.collection = collection
         self.len_collection = len(self.collection)
         self.types = ['', 'Phrase', 'Verb', 'Noun', 'Irregular Verb', 'Regular verb', 'Adjective']
